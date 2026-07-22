@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: apex-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: apex_bank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - apex-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: apex-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@apexbank.ai
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - apex-network
+
+  redis:
+    image: redis:7
+    container_name: apex-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - apex-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.0
+    container_name: apex-zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - apex-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: apex-kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: apex-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - apex-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    container_name: apex-keycloak
+    command: start-dev
+    restart: always
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - apex-network
+
+volumes:
+  postgres_data:
+
+networks:
+  apex-network:
+    driver: bridge

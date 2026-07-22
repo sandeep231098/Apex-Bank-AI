@@ -1,22 +1,27 @@
 package com.apexbank.auth.controller;
 
-import com.apexbank.auth.dto.request.RegisterRequest;
-import com.apexbank.auth.dto.response.LoginResponse;
-import com.apexbank.auth.service.AuthService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1")
 public class AuthController {
 
-    private final AuthService authService;
+    @GetMapping("/public/health")
+    public String health() {
+        return "Application Running";
+    }
 
-    @PostMapping("/register")
-    public LoginResponse register(@Valid @RequestBody RegisterRequest request) {
-        return authService.register(request);
+    @GetMapping("/user")
+    public Authentication user(Authentication authentication) {
+        return authentication;
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin")
+    public String admin() {
+        return "Welcome Admin";
     }
 
 }
