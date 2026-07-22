@@ -8,35 +8,42 @@ import {
   TextField,
 } from "@mui/material";
 
-export default function OtpForm() {
+export default function ResetPasswordForm() {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = (data: any) => {
     console.log(data);
-    alert("OTP Verified");
+    alert("Password Changed");
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
         <TextField
-          label="Enter OTP"
-          fullWidth
-          {...register("otp")}
+          label="New Password"
+          type="password"
+          {...register("password")}
+        />
+
+        <TextField
+          label="Confirm Password"
+          type="password"
+          {...register("confirmPassword")}
         />
 
         <Button
           type="submit"
           variant="contained"
+          size="large"
         >
-          Verify OTP
+          Update Password
         </Button>
 
         <Button
           component={Link}
           to="/login"
         >
-          Cancel
+          Back to Login
         </Button>
       </Stack>
     </Box>

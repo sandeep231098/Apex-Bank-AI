@@ -1,33 +1,23 @@
-import type { ReactNode } from "react";
-
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
-
 import { Provider } from "react-redux";
+import { Toaster } from "react-hot-toast";
 
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
-
-import { appTheme } from "@/app/theme";
-import { store } from "@/app/store/store";
-
-const queryClient = new QueryClient();
+import { store } from "../store/store";
 
 type Props = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
-export default function AppProvider({ children }: Props) {
+export default function AppProvider({
+  children,
+}: Props) {
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={appTheme}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
-      </QueryClientProvider>
+      {children}
+
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+      />
     </Provider>
   );
 }

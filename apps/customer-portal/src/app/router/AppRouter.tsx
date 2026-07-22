@@ -6,7 +6,14 @@ import {
 } from "react-router-dom";
 
 import DashboardPage from "@/features/dashboard/pages/DashboardPage";
+
 import LoginPage from "@/features/auth/pages/LoginPage";
+import RegisterPage from "@/features/auth/pages/RegisterPage";
+import ForgotPasswordPage from "@/features/auth/pages/ForgotPasswordPage";
+import OtpVerificationPage from "@/features/auth/pages/OtpVerificationPage";
+import ResetPasswordPage from "@/features/auth/pages/ResetPasswordPage";
+
+import ProtectedRoute from "./guards/ProtectedRoute";
 
 export default function AppRouter() {
   return (
@@ -18,8 +25,32 @@ export default function AppRouter() {
         />
 
         <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPasswordPage />}
+        />
+
+        <Route
+          path="/otp"
+          element={<OtpVerificationPage />}
+        />
+
+        <Route
+          path="/reset-password"
+          element={<ResetPasswordPage />}
+        />
+
+        <Route
           path="/dashboard"
-          element={<DashboardPage />}
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
         />
 
         <Route

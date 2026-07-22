@@ -8,35 +8,36 @@ import {
   TextField,
 } from "@mui/material";
 
-export default function OtpForm() {
+export default function ForgotPasswordForm() {
   const { register, handleSubmit } = useForm();
 
   const onSubmit = (data: any) => {
     console.log(data);
-    alert("OTP Verified");
+    alert("OTP will be sent from Spring Boot.");
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
         <TextField
-          label="Enter OTP"
+          label="Email Address"
           fullWidth
-          {...register("otp")}
+          {...register("email")}
         />
 
         <Button
           type="submit"
           variant="contained"
+          size="large"
         >
-          Verify OTP
+          Send OTP
         </Button>
 
         <Button
           component={Link}
           to="/login"
         >
-          Cancel
+          Back to Login
         </Button>
       </Stack>
     </Box>

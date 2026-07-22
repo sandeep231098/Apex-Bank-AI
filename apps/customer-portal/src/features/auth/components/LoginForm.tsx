@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 
 import {
   Alert,
@@ -34,7 +35,7 @@ export default function LoginForm() {
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    alert("Login API will be connected in Sprint 4");
+    alert("Login API will be connected in Spring Boot");
   };
 
   return (
@@ -67,8 +68,8 @@ export default function LoginForm() {
 
         <Button
           type="submit"
-          size="large"
           variant="contained"
+          size="large"
           disabled={isSubmitting}
         >
           Sign In
@@ -81,6 +82,14 @@ export default function LoginForm() {
           <br />
           Password@123
         </Alert>
+
+        <Button
+          component={Link}
+          to="/register"
+          variant="text"
+        >
+          Don't have an account? Register
+        </Button>
       </Stack>
     </Box>
   );
