@@ -1,3 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
-export const rootReducer = combineReducers({});
+const appReducer = (state = {}) => state;
+
+export const rootReducer = combineReducers({
+  app: appReducer,
+});
