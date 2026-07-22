@@ -6,6 +6,7 @@ import com.apexbank.auth.dto.response.LoginResponse;
 import com.apexbank.auth.dto.response.UserResponse;
 import com.apexbank.auth.entity.Role;
 import com.apexbank.auth.entity.User;
+import com.apexbank.auth.exception.ApiException;
 import com.apexbank.auth.repository.UserRepository;
 import com.apexbank.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ApiException("Email already exists");
         }
 
         User user = new User();
