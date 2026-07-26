@@ -1,6 +1,7 @@
 package com.apexbank.transaction.controller;
 
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
+import com.apexbank.transaction.dto.request.TransactionSearchRequest;
 import com.apexbank.transaction.dto.request.TransferRequest;
 import com.apexbank.transaction.dto.response.TransactionResponse;
 import com.apexbank.transaction.service.TransactionService;
@@ -63,4 +64,16 @@ public class TransactionController {
     public List<TransactionResponse> getByAccount(@PathVariable UUID accountId) {
         return service.getByAccount(accountId);
     }
+
+    @PostMapping("/search")
+    public Page<TransactionResponse> search(
+
+            @RequestBody TransactionSearchRequest request,
+
+            @PageableDefault(size = 10, sort = "createdAt")
+            Pageable pageable) {
+
+        return service.search(request, pageable);
+    }
+
 }

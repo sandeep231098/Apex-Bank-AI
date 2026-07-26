@@ -7,12 +7,14 @@ import com.apexbank.transaction.client.AccountFeignClient;
 import com.apexbank.transaction.client.dto.CreditRequest;
 import com.apexbank.transaction.client.dto.DebitRequest;
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
+import com.apexbank.transaction.dto.request.TransactionSearchRequest;
 import com.apexbank.transaction.dto.request.TransferRequest;
 import com.apexbank.transaction.dto.response.TransactionResponse;
 import com.apexbank.transaction.entity.Transaction;
 import com.apexbank.transaction.mapper.TransactionMapper;
 import com.apexbank.transaction.repository.TransactionRepository;
 import com.apexbank.transaction.service.TransactionService;
+import com.apexbank.transaction.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -156,6 +158,30 @@ public class TransactionServiceImpl implements TransactionService {
         return repository
                 .findByFromAccountIdOrderByCreatedAtDesc(accountId, pageable)
                 .map(mapper::toResponse);
+    }
+
+    @Override
+    public Page<TransactionResponse> search(
+            TransactionSearchRequest request,
+            Pageable pageable) {
+
+        return repository.findAll(
+
+                TransactionSpecification.search(
+
+                        request.getAccountId(),
+                        request.getTransactionType(),
+                        request.getTransactionStatus(),
+                        request.getFromDate(),
+                        request.getToDate(),
+                        request.getMinAmount(),
+                        request.getMaxAmount()
+
+                ),
+
+                pageable
+
+        ).map(mapper::toResponse);
     }
 
 }
