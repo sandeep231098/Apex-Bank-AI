@@ -7,8 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
         <module name="auth-service" />
+        <module name="api-gateway" />
+        <module name="transaction-service" />
+        <module name="common-lib" />
+        <module name="user-service" />
+        <module name="account-service" />
+        <module name="discovery-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -16,6 +21,8 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="" />
       <module name="auth-service" options="" />
+      <module name="common-lib" options="" />
+      <module name="transaction-service" options="" />
     </option>
   </component>
 </project>
