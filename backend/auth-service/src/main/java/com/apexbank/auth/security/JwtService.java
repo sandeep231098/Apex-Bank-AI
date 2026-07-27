@@ -1,59 +1,73 @@
 package com.apexbank.auth.security;
 
-import javax.crypto.SecretKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    // Base64 encoded 256-bit key (development only).
-    // We'll move this to application.properties later.
-    private static final String SECRET_KEY =
-            "ZmY4YjFkM2I0NmU5YjFmMzUyNGE4NjQzYzQ5YjFlYzQ0Y2Y4YzQ0ZjA4YjM0YzM0ZDI0ZjI3ZmViYjMzMjY0YQ==";
+    private static final String SECRET =
+            "ApexBankAISecretKey123456789012345678901234567890";
 
-    public String generateToken(UserDetails userDetails) {
+    private static final long EXPIRATION =
+            1000 * 60 * 60 * 24;
+
+    private final SecretKey key =
+            Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+
+    public String generateToken(String username) {
 
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(key)
                 .compact();
     }
 
     public String extractUsername(String token) {
+
         return extractClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isValid(String token, String username) {
 
-        String username = extractUsername(token);
-
-        return username.equals(userDetails.getUsername())
+        return extractUsername(token).equals(username)
                 && !extractClaims(token).getExpiration().before(new Date());
     }
 
     private Claims extractClaims(String token) {
 
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
+    public String generateRefreshToken(String username) {
 
-    private SecretKey getSigningKey() {
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(new Date(
+                        System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 7)
+                ))
+                .signWith(key)
+                .compact();
+    }
+    public Date extractExpiration(String token) {
 
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return extractClaims(token).getExpiration();
+    }
+    public long getRemainingValidity(String token) {
 
-        return Keys.hmacShaKeyFor(keyBytes);
+        return extractExpiration(token).getTime()
+                - System.currentTimeMillis();
     }
 }

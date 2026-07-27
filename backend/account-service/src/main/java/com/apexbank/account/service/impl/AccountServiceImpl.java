@@ -1,33 +1,24 @@
 package com.apexbank.account.service.impl;
 
-import com.apexbank.account.dto.request.CreateAccountRequest;
-import com.apexbank.account.dto.request.UpdateAccountRequest;
+import com.apexbank.account.dto.request.*;
 import com.apexbank.account.dto.response.AccountResponse;
+import com.apexbank.account.dto.response.BalanceUpdateResponse;
+import com.apexbank.account.dto.response.balance.BalanceResponse;
 import com.apexbank.account.entity.Account;
 import com.apexbank.account.mapper.AccountMapper;
 import com.apexbank.account.repository.AccountRepository;
 import com.apexbank.account.service.AccountService;
+import com.apexbank.common.enums.AccountStatus;
 import com.apexbank.common.exception.BusinessException;
 import com.apexbank.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import com.apexbank.account.dto.request.DepositRequest;
-import com.apexbank.account.dto.request.WithdrawRequest;
-import com.apexbank.account.dto.request.TransferMoneyRequest;
-import com.apexbank.common.enums.AccountStatus;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.apexbank.account.dto.request.DebitRequest;
-import com.apexbank.account.dto.request.CreditRequest;
-import com.apexbank.account.dto.response.BalanceUpdateResponse;
-import org.springframework.transaction.annotation.Transactional;
-import java.math.BigDecimal;
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -79,14 +70,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponse update(UUID id,
-                                  UpdateAccountRequest request) {
+    public AccountResponse update(UUID id, UpdateAccountRequest request) {
 
         Account account = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Account not found"));
 
         mapper.update(request, account);
+
+        account.setUpdatedAt(LocalDateTime.now());
 
         Account updated = repository.save(account);
 
@@ -103,22 +95,6 @@ public class AccountServiceImpl implements AccountService {
         repository.deleteById(id);
     }
 
-    private String generateAccountNumber() {
-
-        Random random = new Random();
-
-        String accountNumber;
-
-        do {
-
-            accountNumber = String.valueOf(
-                    100000000000L +
-                            (Math.abs(random.nextLong()) % 900000000000L));
-
-        } while (repository.existsByAccountNumber(accountNumber));
-
-        return accountNumber;
-    }
     @Override
     @Transactional
     public AccountResponse deposit(DepositRequest request) {
@@ -132,11 +108,13 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setBalance(account.getBalance().add(request.getAmount()));
+        account.setUpdatedAt(LocalDateTime.now());
 
         Account updated = repository.save(account);
 
         return mapper.toResponse(updated);
     }
+
     @Override
     @Transactional
     public AccountResponse withdraw(WithdrawRequest request) {
@@ -154,11 +132,13 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setBalance(account.getBalance().subtract(request.getAmount()));
+        account.setUpdatedAt(LocalDateTime.now());
 
         Account updated = repository.save(account);
 
         return mapper.toResponse(updated);
     }
+
     @Override
     @Transactional
     public void transfer(TransferMoneyRequest request) {
@@ -189,6 +169,9 @@ public class AccountServiceImpl implements AccountService {
         toAccount.setBalance(
                 toAccount.getBalance().add(request.getAmount()));
 
+        fromAccount.setUpdatedAt(LocalDateTime.now());
+        toAccount.setUpdatedAt(LocalDateTime.now());
+
         repository.save(fromAccount);
         repository.save(toAccount);
     }
@@ -209,6 +192,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setBalance(account.getBalance().subtract(request.getAmount()));
+        account.setUpdatedAt(LocalDateTime.now());
 
         repository.save(account);
 
@@ -219,6 +203,7 @@ public class AccountServiceImpl implements AccountService {
                 .message("Debit successful")
                 .build();
     }
+
     @Override
     @Transactional
     public BalanceUpdateResponse credit(CreditRequest request) {
@@ -232,6 +217,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setBalance(account.getBalance().add(request.getAmount()));
+        account.setUpdatedAt(LocalDateTime.now());
 
         repository.save(account);
 
@@ -241,5 +227,56 @@ public class AccountServiceImpl implements AccountService {
                 .balance(account.getBalance())
                 .message("Credit successful")
                 .build();
+    }
+
+    @Override
+    public BalanceResponse getBalance(UUID accountId) {
+
+        Account account = repository.findById(accountId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Account not found"));
+
+        return BalanceResponse.builder()
+                .accountId(account.getId())
+                .accountNumber(account.getAccountNumber())
+                .availableBalance(account.getBalance())
+                .currency(account.getCurrency())
+                .accountStatus(account.getAccountStatus())
+                .build();
+    }
+
+    private String generateAccountNumber() {
+
+        Random random = new Random();
+
+        String accountNumber;
+
+        do {
+
+            accountNumber = String.valueOf(
+                    100000000000L +
+                            (Math.abs(random.nextLong()) % 900000000000L));
+
+        } while (repository.existsByAccountNumber(accountNumber));
+
+        return accountNumber;
+    }
+
+    @Override
+    @Transactional
+    public AccountResponse changeAccountStatus(
+            UUID accountId,
+            FreezeAccountRequest request) {
+
+        Account account = repository.findById(accountId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Account not found"));
+
+        account.setAccountStatus(request.getAccountStatus());
+        account.setUpdatedAt(LocalDateTime.now());
+
+        Account updated = repository.save(account);
+
+        return mapper.toResponse(updated);
     }
 }

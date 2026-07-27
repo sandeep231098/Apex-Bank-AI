@@ -1,7 +1,9 @@
 package com.apexbank.transaction.service.impl;
 
+
 import com.apexbank.common.enums.TransactionStatus;
 import com.apexbank.common.enums.TransactionType;
+import com.apexbank.common.exception.BusinessException;
 import com.apexbank.common.exception.ResourceNotFoundException;
 import com.apexbank.transaction.client.AccountFeignClient;
 import com.apexbank.transaction.client.dto.CreditRequest;
@@ -10,9 +12,13 @@ import com.apexbank.transaction.dto.request.CreateTransactionRequest;
 import com.apexbank.transaction.dto.request.TransactionSearchRequest;
 import com.apexbank.transaction.dto.request.TransferRequest;
 import com.apexbank.transaction.dto.response.TransactionResponse;
+import com.apexbank.transaction.entity.DailyTransferLimit;
 import com.apexbank.transaction.entity.Transaction;
+import com.apexbank.transaction.entity.TransactionRequestLog;
 import com.apexbank.transaction.mapper.TransactionMapper;
+import com.apexbank.transaction.repository.DailyTransferLimitRepository;
 import com.apexbank.transaction.repository.TransactionRepository;
+import com.apexbank.transaction.repository.TransactionRequestLogRepository;
 import com.apexbank.transaction.service.TransactionService;
 import com.apexbank.transaction.specification.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -29,9 +38,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
+    private final TransactionRequestLogRepository requestLogRepository;
     private final TransactionRepository repository;
     private final TransactionMapper mapper;
     private final AccountFeignClient accountFeignClient;
+    private static final BigDecimal DAILY_TRANSFER_LIMIT = new BigDecimal("100000");
+    private final DailyTransferLimitRepository dailyTransferLimitRepository;
+
 
     @Override
     @Transactional
@@ -75,21 +88,25 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public TransactionResponse transfer(TransferRequest request) {
+    public TransactionResponse transfer(String requestId,
+                                        TransferRequest request) {
 
-        DebitRequest debitRequest = DebitRequest.builder()
-                .accountId(request.getFromAccountId())
-                .amount(request.getAmount())
-                .build();
+        var existing = requestLogRepository.findByRequestId(requestId);
 
-        accountFeignClient.debit(debitRequest);
+        if (existing.isPresent()) {
 
-        CreditRequest creditRequest = CreditRequest.builder()
-                .accountId(request.getToAccountId())
-                .amount(request.getAmount())
-                .build();
+            Transaction transaction = repository.findById(
+                            existing.get().getTransactionId())
+                    .orElseThrow();
 
-        accountFeignClient.credit(creditRequest);
+            return mapper.toResponse(transaction);
+        }
+
+        // Keep all your existing transfer logic here:
+        // - self-transfer validation
+        // - daily limit validation
+        // - debit
+        // - credit
 
         Transaction transaction = Transaction.builder()
                 .transactionReference(generateReference())
@@ -104,9 +121,15 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction saved = repository.save(transaction);
 
+        requestLogRepository.save(
+                TransactionRequestLog.builder()
+                        .requestId(requestId)
+                        .transactionId(saved.getId())
+                        .createdAt(LocalDateTime.now())
+                        .build());
+
         return mapper.toResponse(saved);
     }
-
     @Override
     public TransactionResponse getById(UUID id) {
 

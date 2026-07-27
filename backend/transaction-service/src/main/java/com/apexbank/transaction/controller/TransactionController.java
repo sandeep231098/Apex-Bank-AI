@@ -37,8 +37,11 @@ public class TransactionController {
 
     @PostMapping("/transfer")
     @ResponseStatus(HttpStatus.OK)
-    public TransactionResponse transfer(@Valid @RequestBody TransferRequest request) {
-        return service.transfer(request);
+    public TransactionResponse transfer(
+            @RequestHeader("X-Request-Id") String requestId,
+            @Valid @RequestBody TransferRequest request) {
+
+        return service.transfer(requestId, request);
     }
 
     @GetMapping("/account/{accountId}/statement")

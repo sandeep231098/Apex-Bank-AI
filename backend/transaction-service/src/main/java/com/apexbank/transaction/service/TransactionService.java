@@ -16,7 +16,8 @@ public interface TransactionService {
 
     TransactionResponse withdraw(CreateTransactionRequest request);
 
-    TransactionResponse transfer(TransferRequest request);
+    TransactionResponse transfer(String requestId,
+                                 TransferRequest request);
 
     TransactionResponse getById(UUID id);
 

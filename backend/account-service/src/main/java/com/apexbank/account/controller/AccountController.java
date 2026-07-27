@@ -3,6 +3,7 @@ package com.apexbank.account.controller;
 import com.apexbank.account.dto.request.*;
 import com.apexbank.account.dto.response.AccountResponse;
 import com.apexbank.account.dto.response.BalanceUpdateResponse;
+import com.apexbank.account.dto.response.balance.BalanceResponse;
 import com.apexbank.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +56,23 @@ public class AccountController {
         return service.debit(request);
     }
 
+    @PatchMapping("/{accountId}/status")
+    public AccountResponse changeAccountStatus(
+            @PathVariable UUID accountId,
+            @Valid @RequestBody FreezeAccountRequest request) {
+
+        return service.changeAccountStatus(accountId, request);
+    }
     @PostMapping("/internal/credit")
     public BalanceUpdateResponse credit(
             @Valid @RequestBody CreditRequest request) {
 
         return service.credit(request);
+    }
+
+    @GetMapping("/{accountId}/balance")
+    public BalanceResponse getBalance(@PathVariable UUID accountId) {
+        return service.getBalance(accountId);
     }
 
     @GetMapping("/{id}")

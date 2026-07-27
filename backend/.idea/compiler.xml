@@ -14,6 +14,7 @@
         <module name="user-service" />
         <module name="account-service" />
         <module name="discovery-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -22,6 +23,7 @@
       <module name="api-gateway" options="" />
       <module name="auth-service" options="" />
       <module name="common-lib" options="" />
+      <module name="notification-service" options="" />
       <module name="transaction-service" options="" />
     </option>
   </component>
