@@ -3,6 +3,7 @@ package com.apexbank.notification.service.impl;
 import com.apexbank.common.dto.NotificationEvent;
 import com.apexbank.notification.exception.EmailSendingException;
 import com.apexbank.notification.service.EmailService;
+import com.apexbank.notification.template.EmailTemplateService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import org.thymeleaf.context.Context;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-    private final TemplateEngine templateEngine;
+    private final EmailTemplateService templateService;
 
     @Value("${spring.mail.username}")
     private String from;
@@ -33,9 +34,8 @@ public class EmailServiceImpl implements EmailService {
                 context.setVariables(event.getVariables());
             }
 
-            String html = templateEngine.process(
-                    event.getTemplateName(),
-                    context);
+            String html =
+                    templateService.process(event);
 
             MimeMessage mimeMessage =
                     mailSender.createMimeMessage();
