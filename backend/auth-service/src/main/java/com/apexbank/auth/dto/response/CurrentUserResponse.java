@@ -3,6 +3,8 @@ package com.apexbank.auth.dto.response;
 import com.apexbank.auth.entity.Role;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -10,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 public class CurrentUserResponse {
 
-    private Long id;
+    private UUID id;
 
     private String firstName;
 

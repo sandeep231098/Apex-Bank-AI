@@ -1,5 +1,6 @@
 package com.apexbank.auth.entity;
 
+import com.apexbank.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
