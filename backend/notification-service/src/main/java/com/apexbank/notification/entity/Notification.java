@@ -22,27 +22,35 @@ public class Notification {
     private UUID id;
 
     @Column(nullable = false)
-    private UUID userId;
+    private String recipient;
 
     @Column(nullable = false)
-    private String recipient;
+    private String subject;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType notificationType;
 
-    @Column(nullable = false)
-    private String subject;
-
-    @Column(nullable = false, length = 5000)
-    private String message;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private NotificationStatus notificationStatus;
+    private NotificationStatus status;
+
+    private String errorMessage;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime sentAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+
+        if (status == null) {
+            status = NotificationStatus.PENDING;
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.apexbank.auth.service.impl;
 
+import java.util.Map;
 import com.apexbank.auth.dto.request.*;
 import com.apexbank.auth.dto.response.CurrentUserResponse;
 import com.apexbank.auth.dto.response.LoginResponse;
@@ -10,12 +11,15 @@ import com.apexbank.auth.entity.RefreshToken;
 import com.apexbank.auth.entity.Role;
 import com.apexbank.auth.entity.User;
 import com.apexbank.auth.exception.ApiException;
+import com.apexbank.auth.kafka.NotificationProducer;
 import com.apexbank.auth.repository.PasswordResetTokenRepository;
 import com.apexbank.auth.repository.RefreshTokenRepository;
 import com.apexbank.auth.repository.UserRepository;
 import com.apexbank.auth.security.JwtService;
 import com.apexbank.auth.service.AuthService;
 import com.apexbank.auth.service.RedisTokenService;
+import com.apexbank.common.dto.NotificationEvent;
+import com.apexbank.common.enums.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +32,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final NotificationProducer notificationProducer;
     private final UserRepository userRepository;
     private final RedisTokenService redisTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -183,6 +188,36 @@ public class AuthServiceImpl implements AuthService {
                         .build();
 
         passwordResetTokenRepository.save(token);
+
+        passwordResetTokenRepository.save(token);
+
+        NotificationEvent event =
+                NotificationEvent.builder()
+
+                        .eventId(UUID.randomUUID())
+
+                        .notificationType(NotificationType.EMAIL)
+
+                        .recipient(user.getEmail())
+
+                        .subject("Reset Password")
+
+                        .templateName("reset-password")
+
+                        .variables(
+                                Map.of(
+                                        "firstName",
+                                        user.getFirstName(),
+
+                                        "resetLink",
+                                        "http://localhost:5173/reset-password?token="
+                                                + token.getToken()
+                                )
+                        )
+
+                        .build();
+
+        notificationProducer.publish(event);
 
         // TODO:
         // Publish Kafka Event
