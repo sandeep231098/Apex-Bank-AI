@@ -4,7 +4,9 @@ public final class KafkaTopics {
 
     private KafkaTopics() {
     }
-
+    public static final String TRANSACTION_TOPIC =
+            "transaction-topic";
+    
     public static final String NOTIFICATION_TOPIC = "notification-topic";
 
 }

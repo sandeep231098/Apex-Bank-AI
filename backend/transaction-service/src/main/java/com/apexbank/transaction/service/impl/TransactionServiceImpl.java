@@ -15,6 +15,7 @@ import com.apexbank.transaction.dto.response.TransactionResponse;
 import com.apexbank.transaction.entity.DailyTransferLimit;
 import com.apexbank.transaction.entity.Transaction;
 import com.apexbank.transaction.entity.TransactionRequestLog;
+import com.apexbank.transaction.kafka.TransactionProducer;
 import com.apexbank.transaction.mapper.TransactionMapper;
 import com.apexbank.transaction.repository.DailyTransferLimitRepository;
 import com.apexbank.transaction.repository.TransactionRepository;
@@ -38,6 +39,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
+    private final TransactionProducer transactionProducer;
     private final TransactionRequestLogRepository requestLogRepository;
     private final TransactionRepository repository;
     private final TransactionMapper mapper;

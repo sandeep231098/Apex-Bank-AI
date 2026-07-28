@@ -6,6 +6,7 @@ public enum TransactionStatus {
 
     SUCCESS,
 
-    FAILED
+    FAILED,
 
+    REVERSED
 }
