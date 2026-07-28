@@ -7,23 +7,17 @@ import com.apexbank.account.entity.Account;
 import com.apexbank.common.enums.AccountStatus;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-
 @Component
 public class AccountMapper {
 
     public Account toEntity(CreateAccountRequest request) {
 
         return Account.builder()
-                .userId(request.getUserId())
+                .customerId(request.getCustomerId())
                 .accountType(request.getAccountType())
-                .balance(request.getOpeningBalance())
                 .currency(request.getCurrency())
-                .branchCode(request.getBranchCode())
-                .ifscCode(request.getIfscCode())
-                .accountStatus(AccountStatus.ACTIVE)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .balance(request.getOpeningBalance())
+                .status(AccountStatus.ACTIVE)
                 .build();
     }
 
@@ -31,24 +25,20 @@ public class AccountMapper {
 
         return AccountResponse.builder()
                 .id(account.getId())
-                .userId(account.getUserId())
+                .customerId(account.getCustomerId())
                 .accountNumber(account.getAccountNumber())
                 .accountType(account.getAccountType())
-                .accountStatus(account.getAccountStatus())
+                .status(account.getStatus())
                 .balance(account.getBalance())
                 .currency(account.getCurrency())
-                .branchCode(account.getBranchCode())
-                .ifscCode(account.getIfscCode())
                 .createdAt(account.getCreatedAt())
                 .updatedAt(account.getUpdatedAt())
                 .build();
     }
 
-    public void update(UpdateAccountRequest request, Account account) {
+    public void update(UpdateAccountRequest request,
+                       Account account) {
 
-        account.setAccountStatus(request.getAccountStatus());
-        account.setBranchCode(request.getBranchCode());
-        account.setIfscCode(request.getIfscCode());
-        account.setUpdatedAt(LocalDateTime.now());
+        account.setStatus(request.getStatus());
     }
 }

@@ -2,6 +2,7 @@ package com.apexbank.account.dto.response;
 
 import com.apexbank.common.enums.AccountStatus;
 import com.apexbank.common.enums.AccountType;
+import com.apexbank.common.enums.CurrencyType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,21 +18,17 @@ public class AccountResponse {
 
     private UUID id;
 
-    private UUID userId;
+    private UUID customerId;
 
     private String accountNumber;
 
     private AccountType accountType;
 
-    private AccountStatus accountStatus;
+    private AccountStatus status;
 
     private BigDecimal balance;
 
-    private String currency;
-
-    private String branchCode;
-
-    private String ifscCode;
+    private CurrencyType currency;
 
     private LocalDateTime createdAt;
 

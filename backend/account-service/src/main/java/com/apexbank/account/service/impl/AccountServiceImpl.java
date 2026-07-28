@@ -33,8 +33,6 @@ public class AccountServiceImpl implements AccountService {
         Account account = mapper.toEntity(request);
 
         account.setAccountNumber(generateAccountNumber());
-        account.setCreatedAt(LocalDateTime.now());
-        account.setUpdatedAt(LocalDateTime.now());
 
         Account saved = repository.save(account);
 
@@ -54,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountResponse> getByUserId(UUID userId) {
 
-        return repository.findByUserId(userId)
+        return repository.findByCustomerId(userId)
                 .stream()
                 .map(mapper::toResponse)
                 .toList();
@@ -70,15 +68,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountResponse update(UUID id, UpdateAccountRequest request) {
+    public AccountResponse update(UUID id,
+                                  UpdateAccountRequest request) {
 
         Account account = repository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Account not found"));
 
         mapper.update(request, account);
-
-        account.setUpdatedAt(LocalDateTime.now());
 
         Account updated = repository.save(account);
 
@@ -103,12 +100,11 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Account not found"));
 
-        if (account.getAccountStatus() != AccountStatus.ACTIVE) {
+        if (account.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Account is not active");
         }
 
         account.setBalance(account.getBalance().add(request.getAmount()));
-        account.setUpdatedAt(LocalDateTime.now());
 
         Account updated = repository.save(account);
 
@@ -123,7 +119,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Account not found"));
 
-        if (account.getAccountStatus() != AccountStatus.ACTIVE) {
+        if (account.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Account is not active");
         }
 
@@ -132,7 +128,6 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setBalance(account.getBalance().subtract(request.getAmount()));
-        account.setUpdatedAt(LocalDateTime.now());
 
         Account updated = repository.save(account);
 
@@ -151,11 +146,11 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Receiver account not found"));
 
-        if (fromAccount.getAccountStatus() != AccountStatus.ACTIVE) {
+        if (fromAccount.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Sender account is not active");
         }
 
-        if (toAccount.getAccountStatus() != AccountStatus.ACTIVE) {
+        if (toAccount.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Receiver account is not active");
         }
 
@@ -169,12 +164,10 @@ public class AccountServiceImpl implements AccountService {
         toAccount.setBalance(
                 toAccount.getBalance().add(request.getAmount()));
 
-        fromAccount.setUpdatedAt(LocalDateTime.now());
-        toAccount.setUpdatedAt(LocalDateTime.now());
-
         repository.save(fromAccount);
         repository.save(toAccount);
     }
+
     @Override
     @Transactional
     public BalanceUpdateResponse debit(DebitRequest request) {
@@ -183,7 +176,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Account not found"));
 
-        if (account.getAccountStatus() != AccountStatus.ACTIVE) {
+        if (account.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Account is not active");
         }
 
@@ -192,7 +185,6 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setBalance(account.getBalance().subtract(request.getAmount()));
-        account.setUpdatedAt(LocalDateTime.now());
 
         repository.save(account);
 
@@ -212,12 +204,11 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Account not found"));
 
-        if (account.getAccountStatus() != AccountStatus.ACTIVE) {
+        if (account.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Account is not active");
         }
 
         account.setBalance(account.getBalance().add(request.getAmount()));
-        account.setUpdatedAt(LocalDateTime.now());
 
         repository.save(account);
 
@@ -241,8 +232,25 @@ public class AccountServiceImpl implements AccountService {
                 .accountNumber(account.getAccountNumber())
                 .availableBalance(account.getBalance())
                 .currency(account.getCurrency())
-                .accountStatus(account.getAccountStatus())
+                .status(account.getStatus())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public AccountResponse changeAccountStatus(
+            UUID accountId,
+            FreezeAccountRequest request) {
+
+        Account account = repository.findById(accountId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Account not found"));
+
+        account.setStatus(request.getAccountStatus());
+
+        Account updated = repository.save(account);
+
+        return mapper.toResponse(updated);
     }
 
     private String generateAccountNumber() {
@@ -260,23 +268,5 @@ public class AccountServiceImpl implements AccountService {
         } while (repository.existsByAccountNumber(accountNumber));
 
         return accountNumber;
-    }
-
-    @Override
-    @Transactional
-    public AccountResponse changeAccountStatus(
-            UUID accountId,
-            FreezeAccountRequest request) {
-
-        Account account = repository.findById(accountId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Account not found"));
-
-        account.setAccountStatus(request.getAccountStatus());
-        account.setUpdatedAt(LocalDateTime.now());
-
-        Account updated = repository.save(account);
-
-        return mapper.toResponse(updated);
     }
 }

@@ -27,5 +27,10 @@ public interface BeneficiaryRepository
             UUID customerId,
             String beneficiaryAccountNumber
     );
+    Optional<Beneficiary> findByCustomerIdAndBeneficiaryAccountNumberAndStatus(
+            UUID customerId,
+            String beneficiaryAccountNumber,
+            BeneficiaryStatus status
+    );
 
 }

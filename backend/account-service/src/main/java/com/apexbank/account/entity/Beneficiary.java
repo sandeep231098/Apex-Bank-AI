@@ -36,6 +36,9 @@ public class Beneficiary extends BaseEntity {
     @Column(name = "beneficiary_ifsc", nullable = false, length = 20)
     private String beneficiaryIfsc;
 
+    @Column(name = "beneficiary_account_id")
+    private UUID beneficiaryAccountId;
+
     @Column(length = 100)
     private String nickname;
 

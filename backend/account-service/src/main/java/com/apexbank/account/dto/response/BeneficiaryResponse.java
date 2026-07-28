@@ -24,7 +24,7 @@ public class BeneficiaryResponse {
     private String beneficiaryIfsc;
 
     private String nickname;
-
+    private UUID beneficiaryAccountId;
     private BeneficiaryStatus status;
 
     private Boolean verified;

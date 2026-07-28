@@ -6,6 +6,7 @@ import com.apexbank.common.enums.TransactionType;
 import com.apexbank.common.exception.BusinessException;
 import com.apexbank.common.exception.ResourceNotFoundException;
 import com.apexbank.transaction.client.AccountFeignClient;
+import com.apexbank.transaction.client.BeneficiaryFeignClient;
 import com.apexbank.transaction.client.dto.CreditRequest;
 import com.apexbank.transaction.client.dto.DebitRequest;
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
@@ -39,6 +40,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
+
+    private final BeneficiaryFeignClient beneficiaryFeignClient;
     private final TransactionProducer transactionProducer;
     private final TransactionRequestLogRepository requestLogRepository;
     private final TransactionRepository repository;
@@ -104,16 +107,18 @@ public class TransactionServiceImpl implements TransactionService {
             return mapper.toResponse(transaction);
         }
 
-        // Keep all your existing transfer logic here:
-        // - self-transfer validation
-        // - daily limit validation
-        // - debit
-        // - credit
+        // TODO:
+        // - Validate beneficiary
+        // - Check daily transfer limit
+        // - Debit source account
+        // - Credit destination account
+        // These will be implemented after Keycloak integration.
 
         Transaction transaction = Transaction.builder()
                 .transactionReference(generateReference())
                 .fromAccountId(request.getFromAccountId())
-                .toAccountId(request.getToAccountId())
+                // TODO: Replace with beneficiaryAccountId after integration
+                .toAccountId(null)
                 .transactionType(TransactionType.TRANSFER)
                 .transactionStatus(TransactionStatus.SUCCESS)
                 .amount(request.getAmount())
