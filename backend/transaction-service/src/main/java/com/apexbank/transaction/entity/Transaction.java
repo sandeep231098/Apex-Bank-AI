@@ -22,8 +22,15 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "transaction_reference", nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true)
     private String transactionReference;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus transactionStatus;
+
+    @Column(length = 500)
+    private String failureReason;
 
     @Column(name = "from_account_id", nullable = false)
     private UUID fromAccountId;
@@ -34,10 +41,6 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "transaction_status", nullable = false)
-    private TransactionStatus transactionStatus;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;

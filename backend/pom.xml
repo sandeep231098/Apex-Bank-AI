@@ -15,6 +15,7 @@
     <name>Apex Bank AI Backend</name>
 
     <modules>
+        <module>beneficiary-service</module>
         <module>notification-service</module>
         <module>discovery-service</module>
         <module>transaction-service</module>

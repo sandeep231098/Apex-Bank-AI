@@ -8,6 +8,7 @@ import com.apexbank.common.exception.BusinessException;
 import com.apexbank.common.exception.ResourceNotFoundException;
 import com.apexbank.transaction.client.AccountFeignClient;
 import com.apexbank.transaction.client.BeneficiaryFeignClient;
+import com.apexbank.transaction.client.dto.BeneficiaryAccountResponse;
 import com.apexbank.transaction.client.dto.CreditRequest;
 import com.apexbank.transaction.client.dto.DebitRequest;
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
@@ -111,6 +112,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         // TODO
         // Validate beneficiary after Keycloak integration
+        BeneficiaryAccountResponse beneficiary =
+                beneficiaryFeignClient.getBeneficiaryAccount(
+                        request.getFromAccountId(),
+                        request.getBeneficiaryAccountNumber());
+
+        UUID receiverAccountId = beneficiary.getBeneficiaryAccountId();
 
         validateDailyTransferLimit(
                 request.getFromAccountId(),
@@ -123,13 +130,19 @@ public class TransactionServiceImpl implements TransactionService {
 
         accountFeignClient.debit(debitRequest);
 
-        // TODO
-        // Credit beneficiary account after beneficiary integration
+        // Receiver credit will be enabled after beneficiary validation is completed.
+
+        CreditRequest creditRequest = CreditRequest.builder()
+                .accountId(receiverAccountId)
+                .amount(request.getAmount())
+                .build();
+
+        accountFeignClient.credit(creditRequest);
 
         Transaction transaction = Transaction.builder()
                 .transactionReference(generateReference())
                 .fromAccountId(request.getFromAccountId())
-                .toAccountId(null)
+                .toAccountId(receiverAccountId)
                 .transactionType(TransactionType.TRANSFER)
                 .transactionStatus(TransactionStatus.SUCCESS)
                 .amount(request.getAmount())

@@ -102,6 +102,13 @@ public class AccountController {
         return service.update(id, request);
     }
 
+
+    @GetMapping("/internal/{accountId}")
+    public AccountResponse getInternalAccount(
+            @PathVariable UUID accountId) {
+
+        return service.getById(accountId);
+    }
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
