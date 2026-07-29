@@ -88,6 +88,7 @@ public class BeneficiaryController {
 
             @RequestParam UUID customerId,
 
+
             @RequestParam String accountNumber) {
 
         return service.getBeneficiaryAccount(

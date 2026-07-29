@@ -36,4 +36,37 @@ public interface TransactionRepository extends
        FROM Transaction t
        """)
     Long getTotalTransactions();
+
+    @Query("""
+        SELECT t
+        FROM Transaction t
+        WHERE t.fromAccountId = :accountId
+           OR t.toAccountId = :accountId
+        ORDER BY t.createdAt DESC
+        """)
+    Page<Transaction> findStatement(
+            UUID accountId,
+            Pageable pageable
+    );
+    @Query("""
+SELECT COALESCE(SUM(t.amount),0)
+FROM Transaction t
+WHERE t.toAccountId=:accountId
+""")
+    BigDecimal getTotalCredit(UUID accountId);
+
+    @Query("""
+SELECT COALESCE(SUM(t.amount),0)
+FROM Transaction t
+WHERE t.fromAccountId=:accountId
+""")
+    BigDecimal getTotalDebit(UUID accountId);
+
+    @Query("""
+SELECT COUNT(t)
+FROM Transaction t
+WHERE t.fromAccountId=:accountId
+OR t.toAccountId=:accountId
+""")
+    Long getTotalTransactionCount(UUID accountId);
 }

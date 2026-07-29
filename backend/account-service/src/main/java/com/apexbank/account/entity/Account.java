@@ -19,6 +19,7 @@ import java.util.UUID;
 @Builder
 public class Account extends BaseEntity {
 
+
     @Column(nullable = false, unique = true)
     private String accountNumber;
 
@@ -39,4 +40,8 @@ public class Account extends BaseEntity {
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 }

@@ -1,6 +1,7 @@
 package com.apexbank.transaction.service.impl;
 
 
+import com.apexbank.common.dto.TransactionEvent;
 import com.apexbank.common.enums.TransactionStatus;
 import com.apexbank.common.enums.TransactionType;
 import com.apexbank.common.exception.BusinessException;
@@ -12,6 +13,7 @@ import com.apexbank.transaction.client.dto.DebitRequest;
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
 import com.apexbank.transaction.dto.request.TransactionSearchRequest;
 import com.apexbank.transaction.dto.request.TransferRequest;
+import com.apexbank.transaction.dto.response.StatementSummaryResponse;
 import com.apexbank.transaction.dto.response.TransactionResponse;
 import com.apexbank.transaction.entity.DailyTransferLimit;
 import com.apexbank.transaction.entity.Transaction;
@@ -107,17 +109,26 @@ public class TransactionServiceImpl implements TransactionService {
             return mapper.toResponse(transaction);
         }
 
-        // TODO:
-        // - Validate beneficiary
-        // - Check daily transfer limit
-        // - Debit source account
-        // - Credit destination account
-        // These will be implemented after Keycloak integration.
+        // TODO
+        // Validate beneficiary after Keycloak integration
+
+        validateDailyTransferLimit(
+                request.getFromAccountId(),
+                request.getAmount());
+
+        DebitRequest debitRequest = DebitRequest.builder()
+                .accountId(request.getFromAccountId())
+                .amount(request.getAmount())
+                .build();
+
+        accountFeignClient.debit(debitRequest);
+
+        // TODO
+        // Credit beneficiary account after beneficiary integration
 
         Transaction transaction = Transaction.builder()
                 .transactionReference(generateReference())
                 .fromAccountId(request.getFromAccountId())
-                // TODO: Replace with beneficiaryAccountId after integration
                 .toAccountId(null)
                 .transactionType(TransactionType.TRANSFER)
                 .transactionStatus(TransactionStatus.SUCCESS)
@@ -134,6 +145,19 @@ public class TransactionServiceImpl implements TransactionService {
                         .transactionId(saved.getId())
                         .createdAt(LocalDateTime.now())
                         .build());
+
+        TransactionEvent event = TransactionEvent.builder()
+                .transactionId(saved.getId())
+                .reference(saved.getTransactionReference())
+                .fromAccountId(saved.getFromAccountId())
+                .toAccountId(saved.getToAccountId())
+                .amount(saved.getAmount())
+                .transactionType(saved.getTransactionType())
+                .transactionStatus(saved.getTransactionStatus())
+                .createdAt(saved.getCreatedAt())
+                .build();
+
+        transactionProducer.publish(event);
 
         return mapper.toResponse(saved);
     }
@@ -186,10 +210,46 @@ public class TransactionServiceImpl implements TransactionService {
             Pageable pageable) {
 
         return repository
-                .findByFromAccountIdOrderByCreatedAtDesc(accountId, pageable)
+                .findStatement(accountId, pageable)
                 .map(mapper::toResponse);
     }
+    private void validateDailyTransferLimit(
+            UUID accountId,
+            BigDecimal transferAmount) {
 
+        LocalDate today = LocalDate.now();
+
+        DailyTransferLimit dailyLimit = dailyTransferLimitRepository
+                .findByAccountIdAndTransferDate(accountId, today)
+                .orElse(
+                        DailyTransferLimit.builder()
+                                .accountId(accountId)
+                                .transferDate(today)
+                                .totalTransferred(BigDecimal.ZERO)
+                                .build()
+                );
+
+        BigDecimal updatedTotal =
+                dailyLimit.getTotalTransferred().add(transferAmount);
+
+        if (updatedTotal.compareTo(DAILY_TRANSFER_LIMIT) > 0) {
+            throw new BusinessException(
+                    "Daily transfer limit exceeded");
+        }
+
+        dailyLimit.setTotalTransferred(updatedTotal);
+
+        dailyTransferLimitRepository.save(dailyLimit);
+    }
+    @Override
+    public StatementSummaryResponse getStatementSummary(UUID accountId) {
+
+        return StatementSummaryResponse.builder()
+                .totalCredit(repository.getTotalCredit(accountId))
+                .totalDebit(repository.getTotalDebit(accountId))
+                .totalTransactions(repository.getTotalTransactionCount(accountId))
+                .build();
+    }
     @Override
     public Page<TransactionResponse> search(
             TransactionSearchRequest request,
@@ -212,6 +272,9 @@ public class TransactionServiceImpl implements TransactionService {
                 pageable
 
         ).map(mapper::toResponse);
+
+
     }
+
 
 }

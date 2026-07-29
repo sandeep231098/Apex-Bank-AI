@@ -3,6 +3,7 @@ package com.apexbank.transaction.service;
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
 import com.apexbank.transaction.dto.request.TransactionSearchRequest;
 import com.apexbank.transaction.dto.request.TransferRequest;
+import com.apexbank.transaction.dto.response.StatementSummaryResponse;
 import com.apexbank.transaction.dto.response.TransactionResponse;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public interface TransactionService {
 
     List<TransactionResponse> getByAccount(UUID accountId);
 
+    StatementSummaryResponse getStatementSummary(UUID accountId);
     Page<TransactionResponse> getStatement(UUID accountId, Pageable pageable);
 
     Page<TransactionResponse> search(

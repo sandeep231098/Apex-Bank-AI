@@ -16,6 +16,7 @@ public class TransactionProducer {
 
         kafkaTemplate.send(
                 KafkaTopics.TRANSACTION_TOPIC,
+
                 event.getTransactionId().toString(),
                 event
         );

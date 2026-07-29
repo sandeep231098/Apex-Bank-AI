@@ -3,6 +3,7 @@ package com.apexbank.transaction.controller;
 import com.apexbank.transaction.dto.request.CreateTransactionRequest;
 import com.apexbank.transaction.dto.request.TransactionSearchRequest;
 import com.apexbank.transaction.dto.request.TransferRequest;
+import com.apexbank.transaction.dto.response.StatementSummaryResponse;
 import com.apexbank.transaction.dto.response.TransactionResponse;
 import com.apexbank.transaction.service.TransactionService;
 import jakarta.validation.Valid;
@@ -28,7 +29,12 @@ public class TransactionController {
     public TransactionResponse deposit(@Valid @RequestBody CreateTransactionRequest request) {
         return service.deposit(request);
     }
+    @GetMapping("/account/{accountId}/summary")
+    public StatementSummaryResponse getSummary(
+            @PathVariable UUID accountId) {
 
+        return service.getStatementSummary(accountId);
+    }
     @PostMapping("/withdraw")
     @ResponseStatus(HttpStatus.CREATED)
     public TransactionResponse withdraw(@Valid @RequestBody CreateTransactionRequest request) {
