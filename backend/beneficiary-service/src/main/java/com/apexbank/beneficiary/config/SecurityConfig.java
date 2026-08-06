@@ -1,4 +1,4 @@
-package com.apexbank.notification.config;
+package com.apexbank.beneficiary.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,13 +21,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/actuator/**",
-
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-
-                                "/api/notifications/health",
-                                "/api/notifications/test-email"
+                                "/api/beneficiaries/health"
                         ).permitAll()
 
                         .anyRequest().authenticated()

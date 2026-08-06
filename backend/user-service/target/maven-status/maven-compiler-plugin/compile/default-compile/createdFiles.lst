@@ -4,6 +4,7 @@ com\apexbank\user\exception\GlobalExceptionHandler.class
 com\apexbank\user\service\impl\UserServiceImpl.class
 com\apexbank\user\config\SecurityConfig.class
 com\apexbank\user\repository\UserRepository.class
+com\apexbank\user\controller\HealthController.class
 com\apexbank\user\UserServiceApplication.class
 com\apexbank\user\dto\request\CreateUserRequest.class
 com\apexbank\user\mapper\UserMapper.class

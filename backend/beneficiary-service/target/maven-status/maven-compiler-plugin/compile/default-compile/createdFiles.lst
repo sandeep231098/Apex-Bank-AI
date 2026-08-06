@@ -1,10 +1,12 @@
 com\apexbank\beneficiary\BeneficiaryServiceApplication.class
 com\apexbank\beneficiary\dto\response\BeneficiaryAccountResponse$BeneficiaryAccountResponseBuilder.class
+com\apexbank\beneficiary\config\SecurityConfig.class
 com\apexbank\beneficiary\mapper\BeneficiaryMapper.class
 com\apexbank\beneficiary\controller\InternalBeneficiaryController.class
 com\apexbank\beneficiary\dto\response\BeneficiaryResponse$BeneficiaryResponseBuilder.class
 com\apexbank\beneficiary\repository\BeneficiaryRepository.class
 com\apexbank\beneficiary\dto\request\UpdateBeneficiaryRequest.class
+com\apexbank\beneficiary\controller\HealthController.class
 com\apexbank\beneficiary\entity\Beneficiary.class
 com\apexbank\beneficiary\dto\response\BeneficiaryAccountResponse.class
 com\apexbank\beneficiary\controller\BeneficiaryController.class
