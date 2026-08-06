@@ -8,7 +8,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
-        <module name="beneficiary-service" />
         <module name="api-gateway" />
         <module name="transaction-service" />
         <module name="common-lib" />
@@ -16,6 +15,16 @@
         <module name="account-service" />
         <module name="discovery-service" />
         <module name="notification-service" />
+      </profile>
+      <profile name="Annotation profile for Apex Bank AI Backend" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+        </processorPath>
+        <module name="beneficiary-service" />
       </profile>
     </annotationProcessing>
   </component>
