@@ -7,14 +7,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "account-service")
+@FeignClient(name = "beneficiary-service")
 public interface BeneficiaryFeignClient {
 
     @GetMapping("/api/beneficiaries/internal/account-id")
     BeneficiaryAccountResponse getBeneficiaryAccount(
 
-            @RequestParam UUID customerId,
+            @RequestParam("customerId") UUID customerId,
 
-            @RequestParam String accountNumber);
+            @RequestParam("accountNumber") String accountNumber
 
+    );
 }

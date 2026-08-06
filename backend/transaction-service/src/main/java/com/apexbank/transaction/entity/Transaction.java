@@ -22,11 +22,16 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(
+            name = "transaction_reference",
+            nullable = false,
+            unique = true,
+            length = 50
+    )
     private String transactionReference;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_status", nullable = false)
     private TransactionStatus transactionStatus;
 
     @Column(length = 500)

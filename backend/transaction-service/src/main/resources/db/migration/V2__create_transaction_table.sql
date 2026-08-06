@@ -12,6 +12,8 @@ CREATE TABLE transactions
 
     transaction_status VARCHAR(30) NOT NULL,
 
+    failure_reason VARCHAR(500),
+
     amount NUMERIC(19,2) NOT NULL,
 
     remarks VARCHAR(255),

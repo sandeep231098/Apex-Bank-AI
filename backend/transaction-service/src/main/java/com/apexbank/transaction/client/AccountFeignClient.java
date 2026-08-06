@@ -14,13 +14,22 @@ public interface AccountFeignClient {
 
     @GetMapping("/api/accounts/internal/{accountId}")
     AccountResponse getAccount(
-            @PathVariable UUID accountId);
+
+            @PathVariable("accountId") UUID accountId
+
+    );
 
     @PostMapping("/api/accounts/internal/debit")
     BalanceUpdateResponse debit(
-            @RequestBody DebitRequest request);
+
+            @RequestBody DebitRequest request
+
+    );
 
     @PostMapping("/api/accounts/internal/credit")
     BalanceUpdateResponse credit(
-            @RequestBody CreditRequest request);
+
+            @RequestBody CreditRequest request
+
+    );
 }
