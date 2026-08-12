@@ -2,6 +2,7 @@ com\apexbank\beneficiary\BeneficiaryServiceApplication.class
 com\apexbank\beneficiary\dto\response\BeneficiaryAccountResponse$BeneficiaryAccountResponseBuilder.class
 com\apexbank\beneficiary\config\SecurityConfig.class
 com\apexbank\beneficiary\mapper\BeneficiaryMapper.class
+com\apexbank\beneficiary\config\OpenApiConfig.class
 com\apexbank\beneficiary\controller\InternalBeneficiaryController.class
 com\apexbank\beneficiary\dto\response\BeneficiaryResponse$BeneficiaryResponseBuilder.class
 com\apexbank\beneficiary\repository\BeneficiaryRepository.class

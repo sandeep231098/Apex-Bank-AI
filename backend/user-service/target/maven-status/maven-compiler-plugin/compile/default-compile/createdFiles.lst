@@ -1,4 +1,5 @@
 com\apexbank\user\dto\response\UserResponse.class
+com\apexbank\user\config\OpenApiConfig.class
 com\apexbank\user\dto\request\UpdateUserRequest.class
 com\apexbank\user\exception\GlobalExceptionHandler.class
 com\apexbank\user\service\impl\UserServiceImpl.class
