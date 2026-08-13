@@ -1,31 +1,154 @@
 # Apex Bank AI
 
-## Intelligent Banking. Simplified. Secured.
+Enterprise Banking Platform built using Java 21, Spring Boot, Spring Cloud, React, Kafka, Redis, PostgreSQL, Docker and Keycloak.
 
-Apex Bank AI is a cloud-native, AI-powered digital banking platform built using modern enterprise technologies.
+---
 
 ## Tech Stack
 
-### Frontend
-- React 19
-- TypeScript
-- Vite
-- Material UI
+Backend
 
-### Backend
 - Java 21
 - Spring Boot
-- Keycloak
+- Spring Security
+- Spring Cloud
+- Spring Data JPA
+- Spring Cloud Gateway
+- Eureka
+
+Database
+
 - PostgreSQL
-- Redis
+- Flyway
+
+Messaging
+
 - Kafka
+- Zookeeper
 
-### DevOps
+Security
+
+- JWT
+- OAuth2
+- Keycloak
+- Redis Token Blacklist
+
+Infrastructure
+
 - Docker
-- Kubernetes
-- Jenkins
-- GitHub Actions
+- Docker Compose
 
-## Status
+Frontend
 
-🚧 Under Active Development
+- React
+- TypeScript
+- Material UI
+- Redux Toolkit
+
+---
+
+## Microservices
+
+- Discovery Service
+- API Gateway
+- Auth Service
+- User Service
+- Account Service
+- Transaction Service
+- Notification Service
+
+---
+
+## Features
+
+Authentication
+
+- Register
+- Login
+- JWT
+- Refresh Token
+- Logout
+- Role Based Access
+
+Accounts
+
+- Create Account
+- Deposit
+- Withdraw
+- Balance
+
+Transactions
+
+- Transfer
+- Daily Limit
+- Dashboard
+
+Notifications
+
+- Email
+- SMS
+- Push
+
+Observability
+
+- Health Checks
+- Prometheus
+- Grafana
+- ELK
+- Zipkin
+
+---
+
+## Architecture
+
+React
+
+↓
+
+Gateway
+
+↓
+
+Discovery
+
+↓
+
+Auth
+
+↓
+
+Account
+
+↓
+
+Transaction
+
+↓
+
+Notification
+
+↓
+
+Kafka
+
+↓
+
+PostgreSQL
+
+↓
+
+Redis
+
+↓
+
+Keycloak
+
+---
+
+## Build
+
+mvn clean install
+
+Run
+
+docker compose up -d
