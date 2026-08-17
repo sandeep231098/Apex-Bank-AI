@@ -2,6 +2,9 @@ package com.apexbank.auth.service.impl;
 
 import java.util.Map;
 
+
+
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import com.apexbank.auth.client.dto.KeycloakTokenResponse;
 import com.apexbank.auth.dto.request.*;
 import com.apexbank.auth.dto.response.CurrentUserResponse;
@@ -93,13 +96,27 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public CurrentUserResponse getCurrentUser() {
 
-        String email = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
+        var authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new ApiException("User not found"));
+        if (!(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)) {
+            throw new ApiException("Invalid authentication");
+        }
+
+        String email =
+                jwtAuthenticationToken
+                        .getToken()
+                        .getClaimAsString("email");
+
+        if (email == null || email.isBlank()) {
+            throw new ApiException("Email not found in access token");
+        }
+
+        User user =
+                userRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new ApiException("User not found"));
 
         return CurrentUserResponse.builder()
                 .id(user.getId())
